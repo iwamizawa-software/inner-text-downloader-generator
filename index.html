@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>innerText Downloader Generator</title>
+<style>textarea{width: 50%}</style>
+</head>
+<body>
+<h1>License</h1>
+<p><a href="http://creativecommons.org/publicdomain/zero/1.0/"><img src="http://i.creativecommons.org/p/zero/1.0/88x31.png" alt="CC0"></a></p>
+<h1>innerText Downloader Generator</h1>
+<p>Generate bookmarklet</p>
+<dl>
+<dt>JavaScript expression to return target CSS selector</dt>
+<dd><textarea id="selector">location.hostname === 'example.com' ? 'h1' : null</textarea></dd>
+<dt>bookmarklet title</dt>
+<dd><input type="text" id="title" value="save title"></dd>
+</dl>
+<button id="gen">generate</button>
+<script>
+var bookmarklet = document.body.appendChild(document.createElement('a'));
+bookmarklet.onclick = ()=>false;
+document.getElementById('gen').onclick = function () {
+  bookmarklet.href = 'javascript:' + encodeURIComponent('(' + function (selector) {
+    if (!selector)
+      return;
+    var text = document.querySelector(selector).innerText;
+    if (window.innerTextDownloader)
+      URL.revokeObjectURL(innerTextDownloader.href);
+    else
+      window.innerTextDownloader = document.body.appendChild(document.createElement('a'));
+    var a = innerTextDownloader;
+    a.text = a.href = URL.createObjectURL(new Blob([text], {type:'application/octet-stream'}));
+    a.style.display = 'none';
+    var opts = {year: 'numeric'};
+    opts.month = opts.day = opts.hour = opts.minute = opts.second = '2-digit';
+    a.download = (new Date).toLocaleString([], opts).replace(/\D/g, '') + '.txt'
+    a.click();
+  } + ')(' + document.getElementById('selector').value + ')');
+  bookmarklet.text = document.getElementById('title').value;
+};
+</script>
+</body>
+</html>
